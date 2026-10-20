@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: invcontrol
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+    datasource:
+      url: jdbc:h2:mem:invcontrol
+      username: sa
+      password:
