@@ -1,8 +1,12 @@
 package com.rosario.invcontrol.service;
 
+import com.rosario.invcontrol.dto.CategoryRequest;
+import com.rosario.invcontrol.dto.CategoryResponse;
+import com.rosario.invcontrol.dto.ProductResponse;
 import com.rosario.invcontrol.exception.DuplicateResourceException;
 import com.rosario.invcontrol.exception.ResourceInUseException;
 import com.rosario.invcontrol.exception.ResourceNotFoundException;
+import com.rosario.invcontrol.mapper.CategoryMapper;
 import com.rosario.invcontrol.model.Category;
 import com.rosario.invcontrol.repository.CategoryRepository;
 import com.rosario.invcontrol.repository.ProductRepository;
@@ -17,29 +21,29 @@ import java.util.UUID;
 public class CategoryService {
     private final CategoryRepository repository;
     private final ProductRepository productRepository;
+    private final CategoryMapper mapper;
 
-    public List<Category> findAll() { return repository.findAll(); }
+    public List<CategoryResponse> findAll() { return repository.findAll().stream().map(mapper::toResponse).toList(); }
 
-    public List<Category> search(String search) {return repository.findByNameContainingIgnoreCase(search);}
+    public List<CategoryResponse> search(String search) {return repository.findByNameContainingIgnoreCase(search).stream().map(mapper::toResponse).toList();}
 
-    public Category findById(UUID id){
-        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found " + id));
+    public CategoryResponse findById(UUID id){
+        return mapper.toResponse(getEntity(id));
     }
 
-    public Category save(Category category) {
-        if(repository.existsByNameIgnoreCase(category.getName())){
-            throw new DuplicateResourceException("Category already exists: " + category.getName());
-        }
-        return repository.save(category);
+    public CategoryResponse create(CategoryRequest request) {
+        Category category = mapper.toEntity(request);
+        return mapper.toResponse(repository.save(category));
     }
 
-    public Category update(UUID id, Category category){
-        findById(id);
-        if(repository.existsByNameIgnoreCaseAndIdNot(category.getName(), id)){
-            throw new DuplicateResourceException("Category already exists :" +  category.getName());
+    public CategoryResponse update(UUID id, CategoryRequest request){
+        Category category = getEntity(id);
+        if(repository.existsByNameIgnoreCaseAndIdNot(request.name(), id)){
+            throw new DuplicateResourceException("Category already exists: " +  request.name());
         }
-        category.setId(id);
-        return repository.save(category);
+        category.setName(request.name());
+        category.setDescription(request.description());
+        return mapper.toResponse(repository.save(category));
     }
 
     public void delete(UUID id) {
@@ -48,5 +52,9 @@ public class CategoryService {
             throw new ResourceInUseException("Category has products and cannot be deleted");
         }
         repository.deleteById(id);
+    }
+
+    public Category getEntity(UUID id){
+        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found " + id));
     }
 }

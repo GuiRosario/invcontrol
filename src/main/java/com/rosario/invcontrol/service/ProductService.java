@@ -28,8 +28,8 @@ public class ProductService {
         return mapper.toResponse(getEntity(id));
     }
 
-    public List<Product> getByCategoryId(UUID id){
-        return repository.findByCategoryId(id);
+    public List<ProductResponse> getByCategoryId(UUID id){
+        return repository.findByCategoryId(id).stream().map(mapper::toResponse).toList();
     }
 
     public ProductResponse create(ProductRequest request) {
@@ -61,6 +61,6 @@ public class ProductService {
     }
 
     private Category resolveCategory(UUID categoryId){
-        return categoryId != null ? service.findById(categoryId) : null;
+        return categoryId != null ? service.getEntity(categoryId) : null;
     }
 }

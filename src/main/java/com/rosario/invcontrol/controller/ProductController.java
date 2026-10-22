@@ -29,7 +29,7 @@ public class ProductController {
     public List<ProductResponse> lowStock() {return service.lowStock();}
 
     @GetMapping("/category/{categoryId}")
-    public List<Product> getByCategoryId(@PathVariable UUID categoryId){
+    public List<ProductResponse> getByCategoryId(@PathVariable UUID categoryId){
         return service.getByCategoryId(categoryId);
     }
 
