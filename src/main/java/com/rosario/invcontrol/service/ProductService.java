@@ -56,7 +56,7 @@ public class ProductService {
         return repository.findByQuantityLessThan(5).stream().map(mapper::toResponse).toList();
     }
 
-    private Product getEntity(UUID id){
+    public Product getEntity(UUID id){
         return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found: " + id));
     }
 
