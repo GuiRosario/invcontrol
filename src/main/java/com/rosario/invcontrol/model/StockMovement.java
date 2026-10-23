@@ -22,6 +22,7 @@ public class StockMovement {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+    @NotNull(message = "Type is required")
     private MovementType type;
     @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be greater than 0")
